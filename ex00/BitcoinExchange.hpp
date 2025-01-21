@@ -11,5 +11,5 @@ class BitcoinExchange
     public:
         BitcoinExchange();
         ~BitcoinExchange();
-        void read_input(std::string filename);
+        void read_input(const std::string filename);
 };

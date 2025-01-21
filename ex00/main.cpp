@@ -4,7 +4,7 @@ int main(int ac, char **av)
 {
     if(ac == 2)
     {
-        BitcoinExchange btc();
+        BitcoinExchange btc;
         btc.read_input(av[1]);
     }
     else
