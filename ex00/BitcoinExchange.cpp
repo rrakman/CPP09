@@ -1,24 +1,38 @@
 #include"BitcoinExchange.hpp"
 
-BitcoinExchange::BitcoinExchange() {}
-BitcoinExchange::~BitcoinExchange() {}
-
-
-BitcoinExchange::BitcoinExchange(const std::string input_file, const std::string btc_data_csv);
+BitcoinExchange::BitcoinExchange()
 {
-    ifstream file(btc_data_csv);
+    std::string key;
+    std::string value;
+    std::ifstream file("data.csv");
     if (!file.is_open())
     {
-        std::cerr << "Error: cannot open file " << btc_data_csv << std::endl;
+        std::cerr << "Error: cannot open file data.csv" << std::endl;
         return;
     }
     std::string line;
     std::getline(file, line);
     while (std::getline(file, line))
     {
-        std::string key = line.substr(0, line.find(","));
-        std::string value = line.substr(line.find(",") + 1);
-        data[key] = value;
+        key = line.substr(0, line.find(","));
+        value = line.substr(line.find(",") + 1);
+        std::stringstream ss(value);
+        float f = 0;
+        ss >> f;
+        data[key] = f;
     }
+    file.close();
+}
 
+BitcoinExchange::~BitcoinExchange() {}
+
+void BitcoinExchange::read_input(const std::string &filename)
+{
+    std::ifstream input_f(filename);
+    if (!input_f.is_open())
+    {
+        std::cerr << "Error: cannot open file " << filename << std::endl;
+        return;
+    }
+    
 }

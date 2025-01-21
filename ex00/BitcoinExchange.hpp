@@ -2,14 +2,14 @@
 #include<iostream>
 #include<map>
 #include<fstream>
+#include <sstream>
 
 class BitcoinExchange
 {
     private:
-        std::map<std::string, std::string> data;
+        std::map<std::string, float> data;
     public:
         BitcoinExchange();
-        BitcoinExchange(const std::string input_file, const std::string btc_data_csv);
         ~BitcoinExchange();
-
+        void read_input(std::string filename);
 };
