@@ -9,6 +9,6 @@ int main(int ac, char **av)
     }
     RPN rpn;
     std::string arg(av[1]);
-    rpn->store_calculate(arg);
+    rpn.store_and_calculate(arg);
     return 0;
 }
