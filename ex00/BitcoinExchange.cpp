@@ -1,5 +1,37 @@
 #include"BitcoinExchange.hpp"
 
+
+static float covert_to_float(std::string str)
+{
+    std::stringstream ss(str);
+    float f = 0;
+    ss >> f;
+    return f;
+}
+
+static std::string trim_the_spaces(std::string str)
+{
+    size_t start = str.find_first_not_of(" ");
+    size_t end = str.find_last_not_of(" ");
+    return str.substr(start, end - start + 1);
+}
+
+static bool valid_number(const std::string& number_str) {
+    if (number_str.empty())
+        return false;
+    size_t dot_count = std::count(number_str.begin(), number_str.end(), '.');
+    if (dot_count > 1 || number_str.back() == '.')
+        return false;
+    std::string temp_str = number_str;
+    if (temp_str.front() == '-')
+        temp_str.front() = '0';
+    std::string valid_chars = "0123456789.";
+    if (temp_str.find_first_not_of(valid_chars) != std::string::npos)
+        return false;
+    return true;
+}
+
+
 BitcoinExchange::BitcoinExchange()
 {
     std::string key;
@@ -16,9 +48,7 @@ BitcoinExchange::BitcoinExchange()
     {
         key = line.substr(0, line.find(","));
         value = line.substr(line.find(",") + 1);
-        std::stringstream ss(value);
-        float f = 0;
-        ss >> f;
+        float f = covert_to_float(value);
         data[key] = f;
     }
     file.close();
@@ -74,36 +104,6 @@ static bool valid_Date(std::string date)
     {
         return false;
     }
-    return true;
-}
-
-static float covert_to_float(std::string str)
-{
-    std::stringstream ss(str);
-    float f = 0;
-    ss >> f;
-    return f;
-}
-
-static std::string trim_the_spaces(std::string str)
-{
-    size_t start = str.find_first_not_of(" ");
-    size_t end = str.find_last_not_of(" ");
-    return str.substr(start, end - start + 1);
-}
-
-static bool valid_number(const std::string& number_str) {
-    if (number_str.empty())
-        return false;
-    size_t dot_count = std::count(number_str.begin(), number_str.end(), '.');
-    if (dot_count > 1 || number_str.back() == '.')
-        return false;
-    std::string temp_str = number_str;
-    if (temp_str.front() == '-')
-        temp_str.front() = '0';
-    std::string valid_chars = "0123456789.";
-    if (temp_str.find_first_not_of(valid_chars) != std::string::npos)
-        return false;
     return true;
 }
 
