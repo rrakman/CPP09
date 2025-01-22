@@ -24,18 +24,31 @@ BitcoinExchange::BitcoinExchange()
     file.close();
 }
 
+BitcoinExchange & BitcoinExchange::operator=(const BitcoinExchange &src)
+{
+    if(this == &src)
+        return *this;
+    data = src.data;
+    return *this;
+}
+
+BitcoinExchange::BitcoinExchange(const BitcoinExchange &src)
+{
+    *this = src;
+}
+
+
+
 BitcoinExchange::~BitcoinExchange() {}
 
 static bool valid_Date(std::string date)
 {
     if (date.size() != 10)
     {
-        // std::cout<<date<<std::endl;
         return false;
     }
     if (date[4] != '-' || date[7] != '-')
     {
-
         return false;
     }
     for (int i = 0; i < 10; i++)
@@ -43,12 +56,33 @@ static bool valid_Date(std::string date)
         if (i == 4 || i == 7)
             continue;
         if (date[i] < '0' || date[i] > '9'){
-            std::cout << "here" << std::endl;
             return false;
-
         }
     }
+    std::string year = date.substr(0, 4);
+    std::string month = date.substr(5, 2);
+    std::string day = date.substr(8, 2);
+    if (year < "2009" || year > "2023")
+    {
+        return false;
+    }
+    if (month < "01" || month > "12")
+    {
+        return false;
+    }
+    if (day < "01" || day > "31")
+    {
+        return false;
+    }
     return true;
+}
+
+static float covert_to_float(std::string str)
+{
+    std::stringstream ss(str);
+    float f = 0;
+    ss >> f;
+    return f;
 }
 
 static std::string trim_the_spaces(std::string str)
@@ -58,7 +92,37 @@ static std::string trim_the_spaces(std::string str)
     return str.substr(start, end - start + 1);
 }
 
+static bool valid_number(const std::string& number_str) {
+    if (number_str.empty())
+        return false;
+    size_t dot_count = std::count(number_str.begin(), number_str.end(), '.');
+    if (dot_count > 1 || number_str.back() == '.')
+        return false;
+    std::string temp_str = number_str;
+    if (temp_str.front() == '-')
+        temp_str.front() = '0';
+    std::string valid_chars = "0123456789.";
+    if (temp_str.find_first_not_of(valid_chars) != std::string::npos)
+        return false;
+    return true;
+}
 
+float BitcoinExchange::get_btc_price(std::string date)
+{
+    std::map<std::string, float>::iterator it = data.begin();
+    for (; it != data.end(); ++it)
+    {
+        if (it->first == date)
+        {
+            return it->second;
+        }
+        if(it->first > date)
+        {
+            return std::prev(it)->second;
+        }
+    }
+    return -1;
+}
 
 void BitcoinExchange::read_input(const std::string filename)
 {
@@ -83,19 +147,31 @@ void BitcoinExchange::read_input(const std::string filename)
         size_t pipe = line.find("|");
         if(pipe == std::string::npos)
         {
-            std::cerr << "Error: bad input => " << line << std::endl;
+            std::cerr << "Error: bad input (pipe needed) => " << line << std::endl;
             continue;
         }
         line = trim_the_spaces(line);        
         key = trim_the_spaces(line.substr(0, line.find("|")));
         value = trim_the_spaces(line.substr(line.find("|") + 1));
-
         if(!valid_Date(key))
         {
-            std::cerr << "Error: bad input => " << key << std::endl;
+            std::cerr << "Error: bad input (invalid date) => " << key << std::endl;
             continue;
         }
-        
+        float value2 = covert_to_float(value);
+        if(!valid_number(value) || value2 < 0 || value2 > 1000)
+        {
+            std::cerr << "Error: bad input (value) => " << value << std::endl;
+            continue;
+        }
+
+        float btc_price = get_btc_price(key);
+        if(btc_price == -1)
+        {
+            std::cerr << "Error: no data for date => " << key << std::endl;
+            continue;
+        }
+        else
+            std::cout << key << " => " << value << " => " << btc_price * value2 << std::endl;
     }
-    
 }
