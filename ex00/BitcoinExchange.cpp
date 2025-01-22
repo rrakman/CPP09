@@ -174,4 +174,5 @@ void BitcoinExchange::read_input(const std::string filename)
         else
             std::cout << key << " => " << value << " => " << btc_price * value2 << std::endl;
     }
+    input_f.close();
 }
